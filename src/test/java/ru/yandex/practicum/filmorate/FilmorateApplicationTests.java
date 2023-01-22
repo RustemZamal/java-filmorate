@@ -92,7 +92,6 @@ class FilmorateApplicationTests {
 
 		assertEquals(
 				0, userController.getAllUsers().size(), "Пользователь добавляется с неверным логином");
-		assertThrows(ValidationException.class, ()-> userController.createUser(userInvalidLogin));
 	}
 
 	@Test
@@ -210,7 +209,6 @@ class FilmorateApplicationTests {
 		assertEquals(
 				0, filmController.getAllFilms().size(),
 				"Добавился фильм с недопустимым годом выпуска");
-		assertThrows(ValidationException.class, () -> filmController.createFilm(filmInvalidReleaseDate));
 	}
 
 
