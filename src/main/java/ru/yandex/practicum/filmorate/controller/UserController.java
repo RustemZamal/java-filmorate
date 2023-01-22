@@ -13,15 +13,13 @@ import java.util.*;
 @Slf4j
 public class UserController {
 
-    protected final Map<Integer, User> users = new LinkedHashMap<>();
+    private final Map<Integer, User> users = new LinkedHashMap<>();
 
-    protected int generatedId = 1;
+    private int generatedId = 1;
 
     @PostMapping
     @ResponseBody
     public User createUser(@Valid @RequestBody User user) {
-        checkSpaces(user);
-
         user.setId(generatedId++);
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
@@ -35,11 +33,9 @@ public class UserController {
     @PutMapping
     @ResponseBody
     public User updateUser(@Valid @RequestBody User user) {
-        checkSpaces(user);
-
         if (!users.containsKey(user.getId())) {
             log.debug("Не возможно обновить данные не существующего пользователя с id - {}", user.getId());
-            throw new ValidationException("Не возможно обновить данные не существующего пользователя");
+            throw new ValidationException("Не возможно обновить данные пользователя с несуществующем id");
         }
 
         users.put(user.getId(), user);
@@ -54,12 +50,5 @@ public class UserController {
 
     public void deleteUsers() {
         users.clear();
-    }
-
-    private void checkSpaces(User user) {
-        if (user.getLogin().contains(" ")) {
-            log.debug("Логин содержит пробелы");
-            throw new ValidationException("Логин не должен содержать пробелы");
-        }
     }
 }
