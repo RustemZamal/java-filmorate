@@ -23,7 +23,6 @@ import java.time.LocalDate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
@@ -44,7 +43,7 @@ class FilmorateApplicationTests {
 
 
 	@AfterEach
-	public void deleteUsers() {
+	public void deleteUsersAndFilms() {
 		userController.deleteUsers();
 		filmController.deleteAllFilms();
 	}
