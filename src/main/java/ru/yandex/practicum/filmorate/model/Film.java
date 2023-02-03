@@ -8,13 +8,18 @@ import ru.yandex.practicum.filmorate.validation.annotation.AfterOrEqualDate;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Builder
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Film {
-    private int id;
+
+    private Long id;
+
+    Set<Long> likesUserId = new HashSet<>();
 
     @NotBlank(message = "Название не должно быть пустым")
     private String name;
