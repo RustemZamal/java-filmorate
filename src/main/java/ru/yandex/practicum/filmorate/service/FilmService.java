@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -10,18 +10,13 @@ import ru.yandex.practicum.filmorate.storage.UserStorage;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Slf4j
+
+@RequiredArgsConstructor
 @Service
 public class FilmService {
 
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
-
-    @Autowired
-    public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
-        this.filmStorage = filmStorage;
-        this.userStorage = userStorage;
-    }
 
 
     /**
@@ -52,7 +47,6 @@ public class FilmService {
     public void putLike(Long id, Long userId) {
         userStorage.findUserById(userId);
         filmStorage.findFilmById(id).getLikesUserId().add(userId);
-        log.debug("Пользователь с id-{} поставил лайк фильму с id-{}", userId, id);
     }
 
     /**
@@ -93,11 +87,10 @@ public class FilmService {
     public void deleteLike(Long id, Long userId) {
         userStorage.findUserById(userId);
         filmStorage.findFilmById(id).getLikesUserId().remove(userId);
-        log.debug("Пользователь с id-{} удалил лайк фильму с id-{}", userId, id);
     }
 
-    public void deleteFilm(Long id) {
-        filmStorage.deleteFilm(id);
+    public void deleteFilmById(Long id) {
+        filmStorage.deleteFilmById(id);
     }
 
 }

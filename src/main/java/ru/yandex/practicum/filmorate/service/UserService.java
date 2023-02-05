@@ -1,29 +1,22 @@
 package ru.yandex.practicum.filmorate.service;
 
 
-import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.util.buf.UDecoder;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
-
 import java.util.*;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-@Slf4j
+
+@RequiredArgsConstructor
 @Service
 public class UserService {
 
     private final UserStorage userStorage;
 
-    @Autowired
-    public UserService(UserStorage userStorage) {
-        this.userStorage = userStorage;
-    }
 
     /**
      * Метод по созданию пользователя. {@link UserStorage#addUser(User)}
@@ -31,6 +24,10 @@ public class UserService {
      * @return Возвращает созданный объект.
      */
     public User createUser(User user) {
+        if (user.getName() == null || user.getName().isBlank()) {
+            user.setName(user.getLogin());
+        }
+
         return userStorage.addUser(user);
     }
 
@@ -99,7 +96,6 @@ public class UserService {
 
         user.getFriends().add(friendId);
         friend.getFriends().add(id);
-        log.debug("Пользователи с id-{} и id-{} подружились", id, friendId);
     }
 
     /**
@@ -108,16 +104,15 @@ public class UserService {
      * @param friendId идентификатор пользователя, который является другом.
      */
     public void deleteFromFriends(Long id, long friendId) {
-        User user = findUserById(id);
-        User friend = findUserById(friendId);
+        User user = userStorage.findUserById(id);
+        User friend = userStorage.findUserById(friendId);
 
         user.getFriends().remove(friendId);
         friend.getFriends().remove(id);
-        log.debug("Пользователь с id-{} перестал дружить с пользователе с id-{}", id, friendId);
     }
 
-    public void deleteUser(Long id) {
-        userStorage.deleteUser(id);
+    public void deleteUserById(Long id) {
+        userStorage.deleteUserById(id);
     }
 
 }

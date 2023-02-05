@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -11,17 +11,13 @@ import ru.yandex.practicum.filmorate.service.UserService;
 import javax.validation.Valid;
 import java.util.*;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/users")
-@Slf4j
 public class UserController {
 
     private final UserService userService;
 
-    @Autowired
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
 
     /**
      * Эндпоин для создания пользователя {@link UserService#createUser(User)}
@@ -49,10 +45,7 @@ public class UserController {
      * @param friendId идентификатор того, кого добавляют в друзья.
      */
     @PutMapping("/{id}/friends/{friendId}")
-    public void addFriend(
-            @PathVariable(required = false) Long id,
-            @PathVariable(required = false) Long friendId) {
-
+    public void addFriend(@PathVariable Long id, @PathVariable Long friendId) {
         userService.addToFriends(id, friendId);
     }
 
@@ -71,7 +64,7 @@ public class UserController {
      * @return Возвращает пользователя по его id. {@link UserService#findUserById(Long)}
      */
     @GetMapping("/{id}")
-    public User getUser(@PathVariable(required = false) Long id) {
+    public User getUser(@PathVariable Long id) {
         return userService.findUserById(id);
     }
 
@@ -81,7 +74,7 @@ public class UserController {
      * @return Возвращает список друзей пользователя. {@link UserService#findFriends(Long)}
      */
     @GetMapping("/{id}/friends")
-    public List<User> getFriends(@PathVariable(required = false) Long id) {
+    public List<User> getFriends(@PathVariable Long id) {
         return userService.findFriends(id);
     }
 
@@ -92,10 +85,7 @@ public class UserController {
      * @return Возвращает список общих друзей пользователя с id и otherId. {@link UserService#findCommonFriends(Long, Long)}
      */
     @GetMapping("/{id}/friends/common/{otherId}")
-    public List<User> getCommonFriends(
-            @PathVariable(required = false) Long id,
-            @PathVariable(required = false) Long otherId) {
-
+    public List<User> getCommonFriends(@PathVariable Long id, @PathVariable Long otherId) {
         return userService.findCommonFriends(id, otherId);
     }
 
@@ -104,15 +94,13 @@ public class UserController {
      * @param id идентификатор пользователя.
      * @param friendId идентификатор пользователя, который является другом.
      */
-    @DeleteMapping(value = {"/friends", "/{id}/friends/{friendId}"})
-    public void deleteFromFriends(@PathVariable(required = false) Long id,
-                                  @PathVariable(required = false) Long friendId) {
-
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public void deleteFromFriends(@PathVariable Long id, @PathVariable Long friendId) {
             userService.deleteFromFriends(id, friendId);
     }
 
     @DeleteMapping("/{id}")
-    public Map<String, String> deleteUser(@PathVariable(required = false) Long id) {
-        throw new ResponseStatusException(HttpStatus.NOT_IMPLEMENTED, "метод /users/{id} еще не реализован");
+    public Map<String, String> deleteUserById() {
+        throw new ResponseStatusException(HttpStatus.NOT_IMPLEMENTED, "метод удаления по пути /users/id еще не реализован");
     }
 }

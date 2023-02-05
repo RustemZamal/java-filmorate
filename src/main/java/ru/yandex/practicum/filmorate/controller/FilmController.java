@@ -1,7 +1,7 @@
 package ru.yandex.practicum.filmorate.controller;
 
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
@@ -11,25 +11,20 @@ import ru.yandex.practicum.filmorate.service.FilmService;
 import javax.validation.Valid;
 import java.util.*;
 
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/films")
 public class FilmController {
 
     private final FilmService filmService;
 
-    @Autowired
-    public FilmController(FilmService filmService) {
-        this.filmService = filmService;
-    }
-
-    /**
+     /**
      * Эндпоин для создания фильма {@link ru.yandex.practicum.filmorate.storage.FilmStorage#addFilm(Film)}
      * @param film фильм, который необходимо создать
      * @return В ответ возвращает созданный объект
      */
     @PostMapping
     public Film createFilm(@Valid @RequestBody Film film) {
-
         return filmService.addFilm(film);
     }
 
@@ -49,10 +44,7 @@ public class FilmController {
      * @param userId пользователь, который ставит лайк.
      */
     @PutMapping("/{id}/like/{userId}")
-    public void putLike(
-            @PathVariable(required = false) Long id,
-            @PathVariable(required = false) Long userId) {
-
+    public void putLike(@PathVariable Long id, @PathVariable Long userId) {
         filmService.putLike(id, userId);
     }
 
@@ -71,7 +63,7 @@ public class FilmController {
      * @return Возвращает фильм по его id. {@link FilmService#findFilmById(Long)}
      */
     @GetMapping("/{id}")
-    public Film getFilmById(@PathVariable(required = false) Long id) {
+    public Film getFilmById(@PathVariable() Long id) {
         return filmService.findFilmById(id);
     }
 
@@ -81,8 +73,7 @@ public class FilmController {
      * @return Возвращает список фильмов согласна параметру count. {@link FilmService#findPopularFilms(Integer)}
      */
     @GetMapping("/popular")
-    public List<Film> getPopularFilms(
-            @RequestParam(defaultValue = "10", required = false) Integer count) {
+    public List<Film> getPopularFilms(@RequestParam(defaultValue = "10") Integer count) {
         return filmService.findPopularFilms(count);
     }
 
@@ -92,16 +83,14 @@ public class FilmController {
      * @param userId идентификатор пользователя.
      */
     @DeleteMapping("/{id}/like/{userId}")
-    public void deleteLike(
-            @PathVariable(required = false) Long id,
-            @PathVariable(required = false) Long userId) {
+    public void deleteLike(@PathVariable Long id, @PathVariable Long userId) {
 
         filmService.deleteLike(id, userId);
     }
 
     @DeleteMapping("/{id}")
-    public Map<String, String> deleteFilm(@PathVariable(required = false) Long id) {
-        throw new ResponseStatusException(HttpStatus.NOT_IMPLEMENTED, "метод /films/{id} еще не реализован");
+    public Map<String, String> deleteFilmById() {
+        throw new ResponseStatusException(HttpStatus.NOT_IMPLEMENTED, "метод удаления по пути /films/id еще не реализован");
     }
 }
 

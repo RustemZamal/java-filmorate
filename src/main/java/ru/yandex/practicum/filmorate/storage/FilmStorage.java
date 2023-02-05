@@ -33,7 +33,7 @@ public interface FilmStorage {
      */
     Film findFilmById(Long id);
 
-    void deleteFilm(Long id);
+    void deleteFilmById(Long id);
 
 
     void deleteAllFilms();

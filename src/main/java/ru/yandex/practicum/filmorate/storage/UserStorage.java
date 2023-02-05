@@ -22,6 +22,7 @@ public interface UserStorage {
 
     /**
      * Метод по нахождению пользователя по id.
+     *
      * @param userId идентификатор пользователя.
      * @return Возвращает пользователя по его id.
      */
@@ -33,7 +34,7 @@ public interface UserStorage {
      */
     List<User> getAllUsers();
 
-    void deleteUser(Long id);
+    void deleteUserById(Long id);
 
     void deleteAllUsers();
 }
