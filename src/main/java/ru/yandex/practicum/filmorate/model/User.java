@@ -7,13 +7,18 @@ import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class User {
-    private int id;
+
+    private Long id;
+
+    private Set<Long> friends =  new HashSet<>();
 
     @NotBlank(message = "Логин не должен содержать пробелы или быть пустым")
     @Pattern(regexp = "^\\S*$", message = "Логин не должен содержать пробелы")
