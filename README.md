@@ -89,16 +89,16 @@ WHERE film_id = ?
 SELECT films.*, COUNT(likes_to_films.user_id) AS likes
 FROM films
 LEFT JOIN likes_to_films ON films.film_id = likes_to_films.film_id
-GROUP BY films.films_id
-ORDER BY films.films_id
+GROUP BY films.film_id
+ORDER BY films.film_id
 ```
 * получение информации о фильме по его `id`
 ```SQL
 SELECT films.*, COUNT(likes_to_films.user_id) AS likes
 FROM films
 LEFT JOIN likes_to_films ON films.id = likes_to_films.film_id
-WHERE films.films_id = ?
-GROUP BY films.films_id
+WHERE films.film_id = ?
+GROUP BY films.film_id
 ```
 * пользователь ставит лайк фильму
 ```SQL
