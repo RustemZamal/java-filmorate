@@ -43,7 +43,7 @@ DELETE
 FROM users_friends
 WHERE user_id = id? AND friend_id = id?
 ```
-* возвращает список пользователей, являющихся его друзьями
+* возвращает список пользователей, являющихся друзьями другого пользователя
 ```SQL
 SELECT users.*
 FROM users
@@ -88,17 +88,17 @@ WHERE film_id = ?
 ```SQL
 SELECT films.*, COUNT(likes_to_films.user_id) AS likes
 FROM films
-LEFT JOIN likes_to_films ON films.id = likes_to_films.film_id
-GROUP BY films.id
-ORDER BY films.id
+LEFT JOIN likes_to_films ON films.film_id = likes_to_films.film_id
+GROUP BY films.films_id
+ORDER BY films.films_id
 ```
 * получение информации о фильме по его `id`
 ```SQL
 SELECT films.*, COUNT(likes_to_films.user_id) AS likes
 FROM films
 LEFT JOIN likes_to_films ON films.id = likes_to_films.film_id
-WHERE films.id = ?
-GROUP BY films.id
+WHERE films.films_id = ?
+GROUP BY films.films_id
 ```
 * пользователь ставит лайк фильму
 ```SQL
@@ -116,7 +116,7 @@ WHERE film_id = ? AND user_id = ?
 SELECT f.name,
        COUNT(lf.user_id) AS likes
 FROM films AS f
-LEFT JOIN likes_to_films AS lf ON f.id=lf.film_id
+LEFT JOIN likes_to_films AS lf ON f.film_id=lf.film_id
 GROUP BY film_id, f.name
 ORDER BY likes DESC
 ```
@@ -125,7 +125,7 @@ ORDER BY likes DESC
 SELECT f.name,
        g.name
 FROM films AS f
-INNER JOIN films_genres AS fg ЩТ f.id=fg.film_idЩТ
+INNER JOIN films_genres AS fg ON f.film_id=fg.film_id
 INNER JOIN genres AS g ON fg.genre_id=g.genre_id;
 ```
 * получения списка имен пользоветелей кто поставил лайк фильму и названия фильма
@@ -133,7 +133,7 @@ INNER JOIN genres AS g ON fg.genre_id=g.genre_id;
 SELECT us.name AS name_user,
        f.name AS name_movie      
 FROM films AS f
-INNER JOIN likes_to_films AS lf ON f.id=lf.film_id
+INNER JOIN likes_to_films AS lf ON f.film_id=lf.film_id
 INNER JOIN users AS us ON lf.user_id=us.user_id
 ORDER BY us.name
 ```
