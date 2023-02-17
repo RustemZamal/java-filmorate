@@ -117,8 +117,8 @@ SELECT f.name,
        COUNT(lf.user_id) AS likes
 FROM films AS f
 LEFT JOIN likes_to_films AS lf ON f.film_id=lf.film_id
-GROUP BY film_id, f.name
-ORDER BY likes DESC
+GROUP BY f.film_id, f.name
+ORDER BY likes DESC, f.name
 ```
 * получения списка с названием фильмов и жанра
 ```SQL
