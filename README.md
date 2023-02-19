@@ -1,6 +1,7 @@
 # java-filmorate
 
 ### ER-диаграмма и примеры запросов
+#### [created on the website](https://dbdiagram.io/d/63ec79b2296d97641d810b7c)
 ---
 ![Модель базы данных](ER-Diagram.png)
 
