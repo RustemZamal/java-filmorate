@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.dao.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.dao.FriendDao;
 import ru.yandex.practicum.filmorate.exceptions.UserAlreadyExistException;
@@ -56,8 +55,6 @@ public class FriendDaoImpl implements FriendDao {
             "WHERE user_id = ? AND friend_id = ?";
 
     String SQL_USER_EXIST = "SELECT * FROM users WHERE user_id = ?";
-
-    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     private final JdbcTemplate jdbcTemplate;
 

@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.dao.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.dao.MpaRatingDao;
 import ru.yandex.practicum.filmorate.exceptions.MpaNotFoundException;
@@ -21,8 +20,6 @@ public class MpaRatingImpl implements MpaRatingDao {
     String SQL_GET_ALL_MPA = "SELECT * FROM mpa_rating ORDER BY MPA_ID ASC ";
 
     String SQL_GET_MPA_BY_ID = "SELECT * FROM mpa_rating WHERE mpa_id = ?";
-
-    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     private final JdbcTemplate jdbcTemplate;
 

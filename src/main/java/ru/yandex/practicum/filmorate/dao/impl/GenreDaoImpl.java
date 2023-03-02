@@ -2,7 +2,6 @@ package ru.yandex.practicum.filmorate.dao.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.dao.GenreDao;
 import ru.yandex.practicum.filmorate.exceptions.GenreNotFoundException;
@@ -24,8 +23,6 @@ public class GenreDaoImpl implements GenreDao {
 
     String SQL_GET_GENRE_BY_FILM = "SELECT g.* FROM genre g " +
             "INNER JOIN film_genre fg ON g.genre_id = fg.genre_id WHERE film_id = ?";
-
-    private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     private final JdbcTemplate jdbcTemplate;
 
