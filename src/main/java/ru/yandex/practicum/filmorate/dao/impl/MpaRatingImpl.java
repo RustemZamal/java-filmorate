@@ -30,14 +30,10 @@ public class MpaRatingImpl implements MpaRatingDao {
 
     @Override
     public Mpa getMpaById(int id) {
-        Optional<Mpa> mpa = jdbcTemplate.query(SQL_GET_MPA_BY_ID, this::makeMpa, id)
+        return jdbcTemplate.query(SQL_GET_MPA_BY_ID, this::makeMpa, id)
                 .stream()
-                .findFirst();
-
-        if(mpa.isEmpty()) {
-            throw new MpaNotFoundException(String.format("Mpa rating с ID=%d не существует", id));
-        }
-        return mpa.get();
+                .findFirst()
+                .orElseThrow(() -> new MpaNotFoundException(String.format("Mpa rating с ID=%d не существует", id)));
     }
 
     private Mpa makeMpa (ResultSet resultSet, int rowNum) throws SQLException {
