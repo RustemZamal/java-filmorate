@@ -3,7 +3,7 @@
 ### ER-диаграмма и примеры запросов
 #### [created on the website](https://dbdiagram.io/d/63ec79b2296d97641d810b7c)
 ---
-![Модель базы данных](ER-diagram-filmorate.pdf)
+![Модель базы данных](ER-diagram-filmorate.png)
 
 <details>
   <summary><h3>Для пользователей:</h3></summary>
