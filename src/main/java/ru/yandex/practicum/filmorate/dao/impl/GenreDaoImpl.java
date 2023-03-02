@@ -28,15 +28,10 @@ public class GenreDaoImpl implements GenreDao {
 
     @Override
     public Genre getGenreById(int id) {
-        Optional<Genre> genre = jdbcTemplate.query(SQL_GET_GENRE_BY_ID, this::makeGenre, id)
+        return jdbcTemplate.query(SQL_GET_GENRE_BY_ID, this::makeGenre, id)
                 .stream()
-                .findFirst();
-
-        if (genre.isEmpty()) {
-            throw new GenreNotFoundException(String.format("Жанр с id=%d не существует", id));
-        }
-
-        return genre.get();
+                .findFirst()
+                .orElseThrow(() -> new GenreNotFoundException(String.format("Жанр с id=%d не существует", id)));
     }
 
 
