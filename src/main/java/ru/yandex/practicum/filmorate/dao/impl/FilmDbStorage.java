@@ -74,8 +74,6 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film updateFilm(Film film) {
-        findFilmById(film.getId());
-
         SqlParameterSource parUpdate = new MapSqlParameterSource()
                 .addValue("film_id", film.getId())
                 .addValue("name", film.getName())
@@ -83,7 +81,10 @@ public class FilmDbStorage implements FilmStorage {
                 .addValue("release_date", film.getReleaseDate())
                 .addValue("duration", film.getDuration())
                 .addValue("mpa_rating", film.getMpa().getId());
-        namedParameterJdbcTemplate.update(SQL_UPDATE_FILM, parUpdate);
+        int check = namedParameterJdbcTemplate.update(SQL_UPDATE_FILM, parUpdate);
+
+        if (check == 0) {
+            throw new FilmNotFountException(String.format("Фильм с ID=%d не существует", film.getId()));        }
 
         if(film.getGenres() == null || film.getGenres().isEmpty()) {
             namedParameterJdbcTemplate.update(
@@ -93,6 +94,7 @@ public class FilmDbStorage implements FilmStorage {
 
         namedParameterJdbcTemplate.update(
                 SQL_DELETE_ROW_FILM_GENRE, new MapSqlParameterSource("film_id", film.getId()));
+
 
         for (Genre genre : film.getGenres()) {
             SqlParameterSource parInsert = new MapSqlParameterSource()
@@ -111,16 +113,11 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film findFilmById(Long id) {
-        Optional<Film> film = namedParameterJdbcTemplate.query(
+        return namedParameterJdbcTemplate.query(
                 SQL_GET_FILM_BY_ID, new MapSqlParameterSource("film_id", id), this::makeFilm)
                 .stream()
-                .findFirst();
-
-        if (film.isEmpty()) {
-            throw new FilmNotFountException(String.format("Фильм с ID=%d не существует", id));
-        }
-
-        return film.get();
+                .findFirst()
+                .orElseThrow(() -> new FilmNotFountException(String.format("Фильма с id=%d не существует", id)));
     }
 
     private Film makeFilm(ResultSet resultSet, int rowNum) throws SQLException {
