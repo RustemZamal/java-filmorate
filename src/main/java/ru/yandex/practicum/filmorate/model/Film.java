@@ -1,15 +1,13 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import ru.yandex.practicum.filmorate.validation.annotation.AfterOrEqualDate;
 
 import javax.validation.constraints.*;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
+
 
 @Builder
 @Data
@@ -32,4 +30,8 @@ public class Film {
 
     @Positive(message = "Продолжительность фильма не может быть отрицательной")
     private long duration;
+
+    private Mpa mpa;
+    private Set<Genre> genres;
 }
+

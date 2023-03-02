@@ -1,22 +1,34 @@
 package ru.yandex.practicum.filmorate.service;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dao.LikesDao;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
+import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
 
-@RequiredArgsConstructor
+
 @Service
 public class FilmService {
 
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
+    private final LikesDao likesDao;
+
+    public FilmService(
+            @Qualifier("filmDbStorage") FilmStorage filmStorage,
+            @Qualifier("userDbStorage") UserStorage userStorage, LikesDao likesDao) {
+        this.filmStorage = filmStorage;
+        this.userStorage = userStorage;
+        this.likesDao = likesDao;
+    }
 
 
     /**
@@ -25,8 +37,7 @@ public class FilmService {
      * @return Возвращает фильм
      */
     public Film addFilm(Film film) {
-        filmStorage.addFilm(film);
-        return film;
+        return filmStorage.addFilm(film);
     }
 
     /**
@@ -35,8 +46,14 @@ public class FilmService {
      * @return Возвращает измененный фильм
      */
     public Film updateFilm(Film film) {
-        filmStorage.updateFilm(film);
-        return film;
+        if (film.getGenres() != null) {
+            film.setGenres(film.getGenres()
+                    .stream()
+                    .sorted(Comparator.comparing(Genre::getId))
+                    .collect(Collectors.toCollection(LinkedHashSet::new)));
+        }
+
+        return filmStorage.updateFilm(film);
     }
 
     /**
@@ -46,7 +63,8 @@ public class FilmService {
      */
     public void putLike(Long id, Long userId) {
         userStorage.findUserById(userId);
-        filmStorage.findFilmById(id).getLikesUserId().add(userId);
+        filmStorage.findFilmById(id);
+        likesDao.putLike(id, userId);
     }
 
     /**
@@ -72,11 +90,7 @@ public class FilmService {
      * @return Возвращает список популярных фильмов согласна параметру count.
      */
     public List<Film> findPopularFilms(Integer count) {
-        return filmStorage.findAllFilms()
-                .stream()
-                .sorted((f1, f2) -> -(f1.getLikesUserId().size() - f2.getLikesUserId().size()))
-                .limit(count)
-                .collect(Collectors.toList());
+        return likesDao.getPopularFilm(count);
     }
 
     /**
@@ -86,7 +100,9 @@ public class FilmService {
      */
     public void deleteLike(Long id, Long userId) {
         userStorage.findUserById(userId);
-        filmStorage.findFilmById(id).getLikesUserId().remove(userId);
+        filmStorage.findFilmById(id);
+
+        likesDao.removeLike(id, userId);
     }
 
     public void deleteFilmById(Long id) {

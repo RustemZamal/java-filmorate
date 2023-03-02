@@ -1,22 +1,26 @@
 package ru.yandex.practicum.filmorate.service;
 
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dao.FriendDao;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 
-@RequiredArgsConstructor
 @Service
 public class UserService {
 
     private final UserStorage userStorage;
 
+    private final FriendDao friendDao;
+
+    public UserService(@Qualifier("userDbStorage") UserStorage userStorage, FriendDao friendDao) {
+        this.userStorage = userStorage;
+        this.friendDao = friendDao;
+    }
 
     /**
      * Метод по созданию пользователя. {@link UserStorage#addUser(User)}
@@ -63,10 +67,7 @@ public class UserService {
      * @return возвращает список друзей пользователя.
      */
     public List<User> findFriends(Long id) {
-        return userStorage.findUserById(id).getFriends()
-                .stream()
-                .map(userStorage::findUserById)
-                .collect(Collectors.toList());
+        return friendDao.findAllFriends(id);
     }
 
     /**
@@ -76,13 +77,10 @@ public class UserService {
      * @return Возвращает список общих друзей пользователя с id и otherId.
      */
     public List<User> findCommonFriends(Long id, Long otherId) {
-        Set<Long> ids = userStorage.findUserById(id).getFriends();
-        Set<Long> otherIds = userStorage.findUserById(otherId).getFriends();
+        userStorage.findUserById(id);
+        userStorage.findUserById(otherId);
 
-        return ids.stream()
-                .filter(otherIds::contains)
-                .map(userStorage::findUserById)
-                .collect(Collectors.toList());
+        return friendDao.findCommonFriends(id, otherId);
     }
 
     /**
@@ -91,11 +89,10 @@ public class UserService {
      * @param friendId идентификатор того, кого добавляют в друзья.
      */
     public void addToFriends(Long id, Long friendId) {
-        User user = userStorage.findUserById(id);
-        User friend = userStorage.findUserById(friendId);
+        userStorage.findUserById(id);
+        userStorage.findUserById(friendId);
 
-        user.getFriends().add(friendId);
-        friend.getFriends().add(id);
+        friendDao.addToFriends(id, friendId);
     }
 
     /**
@@ -104,11 +101,10 @@ public class UserService {
      * @param friendId идентификатор пользователя, который является другом.
      */
     public void deleteFromFriends(Long id, long friendId) {
-        User user = userStorage.findUserById(id);
-        User friend = userStorage.findUserById(friendId);
+        userStorage.findUserById(id);
+        userStorage.findUserById(friendId);
 
-        user.getFriends().remove(friendId);
-        friend.getFriends().remove(id);
+        friendDao.deleteFromFriends(id, friendId);
     }
 
     public void deleteUserById(Long id) {
