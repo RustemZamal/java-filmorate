@@ -58,7 +58,6 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public User updateUser(User user) {
-        findUserById(user.getId());
         SqlParameterSource parameters = new MapSqlParameterSource()
                 .addValue("user_id", user.getId())
                 .addValue("email", user.getEmail())
@@ -66,23 +65,23 @@ public class UserDbStorage implements UserStorage {
                 .addValue("name", user.getName())
                 .addValue("birthday", user.getBirthday());
 
-        namedParameterJdbcTemplate.update(SQL_UPDATE_USER, parameters);
+        int check = namedParameterJdbcTemplate.update(SQL_UPDATE_USER, parameters);
+
+        if (check == 0) {
+            throw new UserNotFoundException(String.format("Пользователя с id=%d не существует!", user.getId()));
+        }
 
         return findUserById(user.getId());
     }
 
     @Override
     public User findUserById(Long userId) {
-        Optional<User> user = namedParameterJdbcTemplate.query(
+         return namedParameterJdbcTemplate.query(
                 SQL_FIND_USER_BY_ID, new MapSqlParameterSource("user_id", userId), new UserMapper())
                 .stream()
-                .findFirst();
-
-        if (user.isEmpty()) {
-            throw new UserNotFoundException(String.format("There is no user with ID = %d", userId));
-        }
-
-        return user.get();
+                .findFirst()
+                .orElseThrow(() -> new UserNotFoundException(
+                        String.format("Пользователя с id=%d не существует!", userId)));
     }
 
     @Override
