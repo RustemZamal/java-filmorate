@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.dao.impl;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
@@ -15,23 +16,23 @@ import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.utility.UserMapper;
 
 import java.util.List;
-import java.util.Optional;
 
+@Slf4j
 @RequiredArgsConstructor
 @Component
 public class UserDbStorage implements UserStorage {
 
-    String SQL_INSERT_INTO_USERS = "INSERT INTO users(email, login, name, birthday) " +
+    private final static String SQL_INSERT_INTO_USERS = "INSERT INTO users(email, login, name, birthday) " +
             "VALUES (:email, :login, :name, :birthday)";
 
-    String SQL_UPDATE_USER = "UPDATE users SET email = :email," +
+    private final static String SQL_UPDATE_USER = "UPDATE users SET email = :email," +
             " login = :login, name = :name, birthday = :birthday WHERE user_id = :user_id";
 
-    String SQL_FIND_USER_BY_ID = "SELECT * FROM users WHERE user_id = :user_id";
+    private final static String SQL_FIND_USER_BY_ID = "SELECT * FROM users WHERE user_id = :user_id";
 
-    String SQL_GET_ALL_USERS = "SELECT * FROM USERS";
+    private final static String SQL_GET_ALL_USERS = "SELECT * FROM USERS";
 
-    String SQL_DELETE_USER_BY_ID = "DELETE FROM users WHERE user_id = :user_id";
+    private final static String SQL_DELETE_USER_BY_ID = "DELETE FROM users WHERE user_id = :user_id";
 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
@@ -47,12 +48,15 @@ public class UserDbStorage implements UserStorage {
             namedParameterJdbcTemplate.update(SQL_INSERT_INTO_USERS, parameters, holder);
         } catch (DuplicateKeyException e) {
             if (e.getMessage().contains("EMAIL"))
-                throw new UserAlreadyExistException("This EMAIl already exist");
+                throw new UserAlreadyExistException(String.format(
+                        "Пользователь с почтой=%S уже существует!", user.getEmail()));
             else
-                throw new UserAlreadyExistException("This LOGIN already exist");
+                throw new UserAlreadyExistException(String.format(
+                        "Пользователь с логином=%S уже существует!", user.getLogin()));
         }
 
         user.setId(holder.getKey().longValue());
+        log.debug("Добавлен пользователь [{}]", user);
         return user;
     }
 
@@ -71,11 +75,13 @@ public class UserDbStorage implements UserStorage {
             throw new UserNotFoundException(String.format("Пользователя с id=%d не существует!", user.getId()));
         }
 
+        log.debug("Пользователь с id={} обнавлен.", user.getId());
         return findUserById(user.getId());
     }
 
     @Override
     public User findUserById(Long userId) {
+        log.debug("Запрошен пользователь с id={}", userId);
          return namedParameterJdbcTemplate.query(
                 SQL_FIND_USER_BY_ID, new MapSqlParameterSource("user_id", userId), new UserMapper())
                 .stream()
@@ -86,17 +92,12 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public List<User> getAllUsers() {
-         return namedParameterJdbcTemplate.query(SQL_GET_ALL_USERS, new UserMapper());
+        log.debug("Запрошен список всех пользователей.");
+        return namedParameterJdbcTemplate.query(SQL_GET_ALL_USERS, new UserMapper());
     }
 
     @Override
     public void deleteUserById(Long id) {
         namedParameterJdbcTemplate.update(SQL_DELETE_USER_BY_ID, new MapSqlParameterSource("user_id", id));
     }
-
-    @Override
-    public void deleteAllUsers() {
-
-    }
-
 }

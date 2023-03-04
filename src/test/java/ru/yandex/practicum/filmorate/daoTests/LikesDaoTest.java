@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.daoTests;
 
 import lombok.RequiredArgsConstructor;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,11 +16,8 @@ import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -88,18 +84,5 @@ public class LikesDaoTest {
 
         assertThat(filmDbStorage.findFilmById(2L).getLikesUserId().isEmpty())
                 .as("Лайк не удалился из таблицы like_to_film").isTrue();
-    }
-
-    @Test
-    public void shouldReturnPopularFilm() {
-        likesDao.putLike(2L, 1L);
-
-        List<Film> films = likesDao.getPopularFilm(2);
-
-        assertThat(films.size()).as("Возвращается не весь список фильмов.").isEqualTo(2);
-        assertThat(films.stream().mapToLong(Film::getId).toArray())
-                .as("Фильмы возвращаются не отсортированными по кол-ву лайков.")
-                .isEqualTo(new long[]{2, 1});
-
     }
 }

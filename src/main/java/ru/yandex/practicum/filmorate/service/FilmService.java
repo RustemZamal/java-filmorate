@@ -64,6 +64,7 @@ public class FilmService {
     public void putLike(Long id, Long userId) {
         userStorage.findUserById(userId);
         filmStorage.findFilmById(id);
+
         likesDao.putLike(id, userId);
     }
 
@@ -90,7 +91,7 @@ public class FilmService {
      * @return Возвращает список популярных фильмов согласна параметру count.
      */
     public List<Film> findPopularFilms(Integer count) {
-        return likesDao.getPopularFilm(count);
+        return filmStorage.getPopularFilm(count);
     }
 
     /**

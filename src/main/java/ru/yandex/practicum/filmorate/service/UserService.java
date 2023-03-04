@@ -67,6 +67,7 @@ public class UserService {
      * @return возвращает список друзей пользователя.
      */
     public List<User> findFriends(Long id) {
+        userStorage.findUserById(id);
         return friendDao.findAllFriends(id);
     }
 

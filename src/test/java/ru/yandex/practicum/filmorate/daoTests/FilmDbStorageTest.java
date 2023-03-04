@@ -1,4 +1,4 @@
-package ru.yandex.practicum.filmorate.daoTest;
+package ru.yandex.practicum.filmorate.daoTests;
 
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
@@ -7,15 +7,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
+import ru.yandex.practicum.filmorate.dao.LikesDao;
 import ru.yandex.practicum.filmorate.dao.impl.FilmDbStorage;
+import ru.yandex.practicum.filmorate.dao.impl.UserDbStorage;
 import ru.yandex.practicum.filmorate.exceptions.FilmNotFountException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
+import ru.yandex.practicum.filmorate.model.User;
 
 import java.time.LocalDate;
 import java.util.HashSet;
-import java.util.Optional;
+import java.util.List;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -28,6 +31,10 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 public class FilmDbStorageTest {
 
     private final FilmDbStorage filmStorage;
+
+    private final LikesDao likesDao;
+
+    private final UserDbStorage userDbStorage;
 
 
     @BeforeEach
@@ -47,9 +54,18 @@ public class FilmDbStorageTest {
                 .mpa(new Mpa(3, null))
                 .genres(new HashSet<>(Set.of(new Genre(1, null))))
                 .build();
+        User user = User.builder()
+                .login("user")
+                .name("login")
+                .email("email@email.ru")
+                .birthday(LocalDate.of(1990, 7, 2))
+                .build();
+
 
         filmStorage.addFilm(film);
         filmStorage.addFilm(film2);
+        userDbStorage.addUser(user);
+
     }
 
     @Test
@@ -89,6 +105,19 @@ public class FilmDbStorageTest {
         assertThat(actualFilm.getDescription()).as("Fail description").isEqualTo(updatedFilm.getDescription());
         assertThat(actualFilm.getMpa()).as("Fail mpa").isEqualTo(updatedFilm.getMpa());
         assertThat(actualFilm.getGenres()).as("Fail mpa").isEqualTo(updatedFilm.getGenres());
+    }
+
+    @Test
+    public void shouldReturnPopularFilm() {
+        likesDao.putLike(2L, 1L);
+
+        List<Film> films = filmStorage.getPopularFilm(2);
+
+        assertThat(films.size()).as("Возвращается не весь список фильмов.").isEqualTo(2);
+        assertThat(films.stream().mapToLong(Film::getId).toArray())
+                .as("Фильмы возвращаются не отсортированными по кол-ву лайков.")
+                .isEqualTo(new long[]{2, 1});
+
     }
 
     @Test

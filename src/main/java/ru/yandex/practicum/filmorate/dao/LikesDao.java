@@ -23,10 +23,9 @@ public interface LikesDao {
     void removeLike(Long id, Long userId);
 
     /**
-     * Метод по нахождению популярных по количеству лайков фильмов.
-     * @param count количество фильмов, по умолчанию 10.
-     * @return Возвращает список популярных фильмов согласна параметру count.
+     *
+     * @param filmId идентификатор фильмаа.
+     * @return Возвращает id пользователей которые поставили лайк фильму с идентификатором  filmId.
      */
-    List<Film> getPopularFilm(Integer count);
-
+    Set<Long> findLikesByFilm(Long filmId);
 }

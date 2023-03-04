@@ -35,6 +35,4 @@ public interface UserStorage {
     List<User> getAllUsers();
 
     void deleteUserById(Long id);
-
-    void deleteAllUsers();
 }
