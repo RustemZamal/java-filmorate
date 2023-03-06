@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.dao.LikesDao;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -20,7 +21,6 @@ public class LikesDaoImpl implements LikesDao {
     private final static String SQL_REMOVE_LIKE = "DELETE FROM like_to_film WHERE user_id = ? AND film_id = ?";
 
     private final static String SQL_GET_LIKES = "SELECT USER_ID FROM like_to_film WHERE FILM_ID = ?";
-
 
     private final JdbcTemplate jdbcTemplate;
 
