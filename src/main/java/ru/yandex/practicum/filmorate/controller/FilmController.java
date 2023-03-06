@@ -91,7 +91,7 @@ public class FilmController {
 
     @DeleteMapping("/{id}")
     public Map<String, String> deleteFilmById() {
-        throw new ResponseStatusException(HttpStatus.NOT_IMPLEMENTED, "метод удаления по пути /films/id еще не реализован");
+        throw new ResponseStatusException(HttpStatus.NOT_IMPLEMENTED, "метод удаления по пути /films/id еще не реализован!");
     }
 }
 

@@ -33,8 +33,12 @@ public interface FilmStorage {
      */
     Film findFilmById(Long id);
 
+    /**
+     * Метод по нахождению популярных по количеству лайков фильмов.
+     * @param count количество фильмов, по умолчанию 10.
+     * @return Возвращает список популярных фильмов согласна параметру count.
+     */
+    List<Film> getPopularFilm(Integer count);
+
     void deleteFilmById(Long id);
-
-
-    void deleteAllFilms();
 }
