@@ -3,14 +3,20 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
-import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -93,8 +99,8 @@ public class FilmController {
 
 
     @GetMapping("/director/{directorId}")
-    public List<Director> findFilmBySorting(@PathVariable Long directorId, @RequestParam String sortBy) {
-        return null;
+    public List<Film> findFilmBySorting(@PathVariable Long directorId, @RequestParam String sortBy) {
+        return filmService.findFilmBySorting(directorId, sortBy);
     }
 
     /**
@@ -111,8 +117,6 @@ public class FilmController {
     @DeleteMapping("/{id}")
     public Map<String, String> deleteFilmById() {
         throw new ResponseStatusException(HttpStatus.NOT_IMPLEMENTED, "метод удаления по пути /films/id еще не реализован!");
-
     }
-
 }
 
