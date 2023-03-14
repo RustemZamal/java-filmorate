@@ -31,7 +31,7 @@ public class FilmDbStorage implements FilmStorage {
 
     private final static String SQL_INSERT_INTO_FILM =
             "INSERT INTO film (name, description, release_date, duration, mpa_rating) " +
-            "VALUES (:name, :description, :release_date, :duration, :mpa_rating)";
+                    "VALUES (:name, :description, :release_date, :duration, :mpa_rating)";
 
     private final static String SQL_UPDATE_FILM =
             "UPDATE FILM SET name = :name, description = :description, release_date = :release_date," +
@@ -53,15 +53,35 @@ public class FilmDbStorage implements FilmStorage {
 
     private final static String SQL_GET_POPULAR_DATA_AND_GENRE =
             "SELECT fm.* " +
-            "FROM film AS fm " +
-            "LEFT JOIN like_to_film AS lf ON fm.film_id = lf.film_id " +
-            "LEFT JOIN film_genre AS fg ON fm.film_id = fg.film_id " +
-            "LEFT JOIN genre AS gi ON fg.genre_id = gi.genre_id " +
-            "WHERE gi.genre_id = %s AND YEAR(fm.release_date) = %s" +
-            "GROUP BY fm.film_id " +
-            "ORDER BY COUNT(lf.user_id) DESC " +
-            "LIMIT %s ";
+                    "FROM film AS fm " +
+                    "LEFT JOIN like_to_film AS lf ON fm.film_id = lf.film_id " +
+                    "LEFT JOIN film_genre AS fg ON fm.film_id = fg.film_id " +
+                    "LEFT JOIN genre AS gi ON fg.genre_id = gi.genre_id " +
+                    "WHERE gi.genre_id = %s AND YEAR(fm.release_date) = %s " +
+                    "GROUP BY fm.film_id " +
+                    "ORDER BY COUNT(lf.user_id) DESC " +
+                    "LIMIT %s ";
 
+
+    private final static String SQL_GET_POPULAR_DATA =
+            "SELECT fm.* " +
+                    "FROM film AS fm " +
+                    "LEFT JOIN like_to_film AS lf ON fm.film_id = lf.film_id " +
+                    "WHERE YEAR(fm.release_date) = %s " +
+                    "GROUP BY fm.film_id " +
+                    "ORDER BY COUNT(lf.user_id) DESC " +
+                    "LIMIT %s ";
+
+    private final static String SQL_GET_POPULAR_GENRE =
+            "SELECT fm.* " +
+                    "FROM film AS fm " +
+                    "LEFT JOIN like_to_film AS lf ON fm.film_id = lf.film_id " +
+                    "LEFT JOIN film_genre AS fg ON fm.film_id = fg.film_id " +
+                    "LEFT JOIN genre AS gi ON fg.genre_id = gi.genre_id " +
+                    "WHERE gi.genre_id = %s " +
+                    "GROUP BY fm.film_id " +
+                    "ORDER BY COUNT(lf.user_id) DESC " +
+                    "LIMIT %s ";
 
 
     private final static String SQL_FIND_BY_PARAMETER = "SELECT f.* " +
@@ -160,7 +180,7 @@ public class FilmDbStorage implements FilmStorage {
     public Film findFilmById(Long id) {
         log.debug("Запрошен фильм с id={}", id);
         return namedParameterJdbcTemplate.query(
-                SQL_GET_FILM_BY_ID, new MapSqlParameterSource("film_id", id), this::makeFilm)
+                        SQL_GET_FILM_BY_ID, new MapSqlParameterSource("film_id", id), this::makeFilm)
                 .stream()
                 .findFirst()
                 .orElseThrow(() -> new FilmNotFountException(String.format("Фильма с id=%d не существует", id)));
@@ -221,11 +241,19 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public List <Film> getPopularFilmByDateAndGenre (Integer count, Integer genreId, Integer year){
+    public List <Film> getPopularFilmByDateAndGenre (Integer count, Integer genreId, Integer year) {
         log.debug(String.format("Запрошен список популярных фильмов по жанру и году. Где год: %s , жанр ID: %s, лимит: %s ",
                 year, genreId, count));
-        String SQL = String.format(SQL_GET_POPULAR_DATA_AND_GENRE, genreId, year, count);
-        return namedParameterJdbcTemplate.query(SQL, this::makeFilm);
+        String SQL = "s";
 
+        if (genreId != -1 && year != -1){
+            SQL = String.format(SQL_GET_POPULAR_DATA_AND_GENRE, genreId, year, count);
+        } else if (year != -1) {
+            SQL = String.format(SQL_GET_POPULAR_DATA, year, count);
+        } else {
+            SQL = String.format(SQL_GET_POPULAR_GENRE, genreId, count);
+        }
+        System.out.println(SQL);
+        return namedParameterJdbcTemplate.query(SQL, this::makeFilm);
     }
 }

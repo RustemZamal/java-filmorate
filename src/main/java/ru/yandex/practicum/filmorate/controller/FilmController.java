@@ -114,10 +114,5 @@ public class FilmController {
 
     }
 
-    @GetMapping("/popular/p")
-    public String findPopularFilm (@RequestParam Integer count, @RequestParam Integer genreId, @RequestParam Integer year) {
-
-        return "count " + count + "genreId " + genreId + "year " + year;
-    }
 }
 
