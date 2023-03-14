@@ -114,4 +114,17 @@ public class FilmService {
         filmStorage.deleteFilmById(id);
     }
 
+
+
+    /**
+     * Метод нахождения общих фильмов у друзей.
+     * @param friendId идентификатор друга.
+     * @param userId идентификатор пользователя.
+     */
+    public List<Film> getCommonFilms(Long userId, Long friendId) {
+        return filmStorage.getCommonFilms(userStorage.findUserById(userId).getId(),
+                userStorage.findUserById(friendId).getId());
+    }
 }
+
+
