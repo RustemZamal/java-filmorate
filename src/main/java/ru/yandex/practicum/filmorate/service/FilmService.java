@@ -95,6 +95,17 @@ public class FilmService {
     }
 
     /**
+     * Метод по нахождению популярных по количеству лайков фильмов, году и жанру.
+     * @param count количество фильмов, по умолчанию 10.
+     * @genreId genreId id жанра.
+     * @year year год выхода фильма.
+     * @return Возвращает список популярных фильмов согласна параметру count.
+     */
+    public List<Film> findPopularByDateAndGenre (Integer count, Integer genreId, Integer year){
+        return filmStorage.getPopularFilmByDateAndGenre(count, genreId, year);
+    }
+
+    /**
      * Метод по удалению лайка фильму пользователем.
      * @param id идентификатор фильма.
      * @param userId идентификатор пользователя.

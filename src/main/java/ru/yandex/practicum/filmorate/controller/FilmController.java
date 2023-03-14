@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -75,8 +76,14 @@ public class FilmController {
      * @return Возвращает список фильмов согласна параметру count. {@link FilmService#findPopularFilms(Integer)}
      */
     @GetMapping("/popular")
-    public List<Film> getPopularFilms(@RequestParam(defaultValue = "10") Integer count) {
-        return filmService.findPopularFilms(count);
+    public List<Film> getPopularFilms(@RequestParam(defaultValue = "10") Integer count,
+                                      @RequestParam (defaultValue = "-1") Integer genreId,
+                                      @RequestParam (defaultValue = "-1") Integer year) {
+        if (genreId != -1 || year != -1) {
+            return  filmService.findPopularByDateAndGenre(count, genreId, year);
+        } else {
+            return filmService.findPopularFilms(count);
+        }
     }
 
     @GetMapping("/search")
@@ -104,6 +111,13 @@ public class FilmController {
     @DeleteMapping("/{id}")
     public Map<String, String> deleteFilmById() {
         throw new ResponseStatusException(HttpStatus.NOT_IMPLEMENTED, "метод удаления по пути /films/id еще не реализован!");
+
+    }
+
+    @GetMapping("/popular/p")
+    public String findPopularFilm (@RequestParam Integer count, @RequestParam Integer genreId, @RequestParam Integer year) {
+
+        return "count " + count + "genreId " + genreId + "year " + year;
     }
 }
 

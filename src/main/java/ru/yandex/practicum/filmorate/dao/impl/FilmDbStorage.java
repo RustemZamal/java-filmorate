@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.dao.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -18,6 +19,7 @@ import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -47,6 +49,20 @@ public class FilmDbStorage implements FilmStorage {
             "GROUP BY fm.film_id " +
             "ORDER BY COUNT(lf.user_id) DESC " +
             "LIMIT :LIMIT";
+
+
+    private final static String SQL_GET_POPULAR_DATA_AND_GENRE =
+            "SELECT fm.* " +
+            "FROM film AS fm " +
+            "LEFT JOIN like_to_film AS lf ON fm.film_id = lf.film_id " +
+            "LEFT JOIN film_genre AS fg ON fm.film_id = fg.film_id " +
+            "LEFT JOIN genre AS gi ON fg.genre_id = gi.genre_id " +
+            "WHERE gi.genre_id = %s AND YEAR(fm.release_date) = %s" +
+            "GROUP BY fm.film_id " +
+            "ORDER BY COUNT(lf.user_id) DESC " +
+            "LIMIT %s ";
+
+
 
     private final static String SQL_FIND_BY_PARAMETER = "SELECT f.* " +
             "FROM FILM f " +
@@ -204,4 +220,12 @@ public class FilmDbStorage implements FilmStorage {
                 .build();
     }
 
+    @Override
+    public List <Film> getPopularFilmByDateAndGenre (Integer count, Integer genreId, Integer year){
+        log.debug(String.format("Запрошен список популярных фильмов по жанру и году. Где год: %s , жанр ID: %s, лимит: %s ",
+                year, genreId, count));
+        String SQL = String.format(SQL_GET_POPULAR_DATA_AND_GENRE, genreId, year, count);
+        return namedParameterJdbcTemplate.query(SQL, this::makeFilm);
+
+    }
 }
