@@ -102,18 +102,6 @@ public class FilmDbStorage implements FilmStorage {
         log.debug("Добвлен новый фильм [{}]", film);
         addGenreAndDirector(film);
 
-       /* if (film.getGenres() != null) {
-            for (Genre genre : film.getGenres()) {
-                filmGenreDao.insertToFilmGenre(film.getId(), genre.getId());
-            }
-        }
-
-        if (film.getDirectors() != null) {
-            for (Director director : film.getDirectors()) {
-                filmDirectorDao.insertToFilmDirector(film.getId(), director.getId());
-            }
-        }*/
-
         return film;
     }
 
@@ -132,26 +120,11 @@ public class FilmDbStorage implements FilmStorage {
             throw new FilmNotFountException(String.format("Фильм с ID=%d не существует", film.getId()));
         }
 
-
-        // Надо переделать !!!
         filmGenreDao.deleteRowFromFilmGenre(film.getId());
         filmDirectorDao.deleteRowFromFilmDirector(film.getId());
         addGenreAndDirector(film);
-
-
-       /* if (film.getGenres() != null) {
-            for (Genre genre : film.getGenres()) {
-                filmGenreDao.insertToFilmGenre(film.getId(), genre.getId());
-            }
-        }
-
-        if (film.getDirectors() != null) {
-            for (Director director : film.getDirectors()) {
-                filmDirectorDao.insertToFilmDirector(film.getId(), director.getId());
-            }
-        }*/
-
         log.debug("Обновлен фильм с id={}", film.getId());
+
         return findFilmById(film.getId());
     }
 
@@ -215,6 +188,10 @@ public class FilmDbStorage implements FilmStorage {
             log.debug("Инициализирован поиск фильма по лайкам.");
             films = namedParameterJdbcTemplate.getJdbcOperations().query(
                     SQL_FIND_BY_LIKES, this::makeFilm, directorId);
+        }
+
+        if (films.isEmpty()) {
+            throw new FilmNotFountException("Фильмы по таким параметрам запроса не нашлись (((");
         }
 
         return films;
