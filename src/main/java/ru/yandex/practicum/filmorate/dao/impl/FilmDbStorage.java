@@ -29,7 +29,7 @@ public class FilmDbStorage implements FilmStorage {
 
     private final static String SQL_INSERT_INTO_FILM =
             "INSERT INTO film (name, description, release_date, duration, mpa_rating) " +
-            "VALUES (:name, :description, :release_date, :duration, :mpa_rating)";
+                    "VALUES (:name, :description, :release_date, :duration, :mpa_rating)";
 
     private final static String SQL_UPDATE_FILM =
             "UPDATE FILM SET name = :name, description = :description, release_date = :release_date," +
@@ -57,16 +57,24 @@ public class FilmDbStorage implements FilmStorage {
             "GROUP BY f.film_id " +
             "ORDER BY COUNT(lf.user_id) DESC";
 
+    private final static String SQL_FIND_COMMON_FILMS = "SELECT f.* FROM film AS f " +
+            "LEFT JOIN like_to_film AS fl ON f.film_id = fl.film_id " +
+            "WHERE fl.film_id IN (SELECT film_id FROM like_to_film WHERE user_id = ?) " +
+            "AND fl.film_id IN (SELECT film_id FROM like_to_film WHERE user_id = ?) " +
+            "GROUP BY fl.film_id " +
+            "ORDER BY COUNT(fl.user_id) DESC";
+
     private final MpaRatingDao mpaRating;
     private final GenreDao genreDao;
 
-    private  final LikesDao likesDao;
+    private final LikesDao likesDao;
 
     private final FilmGenreDao filmGenreDao;
 
     private final FilmDirectorDao filmDirectorDao;
 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+
 
     @Override
     public Film addFilm(Film film) {
@@ -144,7 +152,7 @@ public class FilmDbStorage implements FilmStorage {
     public Film findFilmById(Long id) {
         log.debug("Запрошен фильм с id={}", id);
         return namedParameterJdbcTemplate.query(
-                SQL_GET_FILM_BY_ID, new MapSqlParameterSource("film_id", id), this::makeFilm)
+                        SQL_GET_FILM_BY_ID, new MapSqlParameterSource("film_id", id), this::makeFilm)
                 .stream()
                 .findFirst()
                 .orElseThrow(() -> new FilmNotFountException(String.format("Фильма с id=%d не существует", id)));
@@ -202,6 +210,12 @@ public class FilmDbStorage implements FilmStorage {
                 .genres((genre))
                 .likesUserId(likes)
                 .build();
+    }
+
+    @Override
+    public List<Film> getCommonFilms(Long userId, Long friendId) {
+        log.info("Получен запрос на получение списка взаимно понравившихся общих с другом фильмов");
+        return namedParameterJdbcTemplate.getJdbcOperations().query(SQL_FIND_COMMON_FILMS, this::makeFilm, userId, friendId);
     }
 
 }

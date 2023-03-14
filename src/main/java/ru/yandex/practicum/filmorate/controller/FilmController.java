@@ -20,8 +20,9 @@ public class FilmController {
 
     private final FilmService filmService;
 
-     /**
+    /**
      * Эндпоин для создания фильма {@link ru.yandex.practicum.filmorate.storage.FilmStorage#addFilm(Film)}
+     *
      * @param film фильм, который необходимо создать
      * @return В ответ возвращает созданный объект
      */
@@ -32,6 +33,7 @@ public class FilmController {
 
     /**
      * Эндпоинт по модифицированию фильма.
+     *
      * @param film фильм, который необходимо изменить.
      * @return В ответ возвращает измененный фильм. {@link FilmService#updateFilm(Film)}
      */
@@ -42,7 +44,8 @@ public class FilmController {
 
     /**
      * Эндпоинт позволяющий пользователем ставить лайки фильмам. {@link FilmService#putLike(Long, Long)}
-     * @param id фильм, которому ставиться лайк.
+     *
+     * @param id     фильм, которому ставиться лайк.
      * @param userId пользователь, который ставит лайк.
      */
     @PutMapping("/{id}/like/{userId}")
@@ -52,6 +55,7 @@ public class FilmController {
 
     /**
      * Эндпоинт по возвращению всех фильмов.
+     *
      * @return Возвращает все фильмы. {@link FilmService#findAllFilms()}
      */
     @GetMapping
@@ -61,6 +65,7 @@ public class FilmController {
 
     /**
      * Эндпоинт по нахождению фильма по его id.
+     *
      * @param id идентификатор фильма.
      * @return Возвращает фильм по его id. {@link FilmService#findFilmById(Long)}
      */
@@ -71,6 +76,7 @@ public class FilmController {
 
     /**
      * Эндпоинт по нахождению популярных по количеству лайков фильмов.
+     *
      * @param count количество фильмов, по умолчанию 10.
      * @return Возвращает список фильмов согласна параметру count. {@link FilmService#findPopularFilms(Integer)}
      */
@@ -92,7 +98,8 @@ public class FilmController {
 
     /**
      * Эндпоинт по удалению лайка фильму пользователем. {@link FilmService#deleteLike(Long, Long)}
-     * @param id идентификатор фильма.
+     *
+     * @param id     идентификатор фильма.
      * @param userId идентификатор пользователя.
      */
     @DeleteMapping("/{id}/like/{userId}")
@@ -105,5 +112,14 @@ public class FilmController {
     public Map<String, String> deleteFilmById() {
         throw new ResponseStatusException(HttpStatus.NOT_IMPLEMENTED, "метод удаления по пути /films/id еще не реализован!");
     }
+
+
+    @GetMapping("/common")
+    public List<Film> getCommonFilms(@RequestParam Long userId, @RequestParam Long friendId) {
+        return filmService.getCommonFilms(userId, friendId);
+    }
 }
+
+
+
 
