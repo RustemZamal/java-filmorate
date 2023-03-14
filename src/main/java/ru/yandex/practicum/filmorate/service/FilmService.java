@@ -106,6 +106,10 @@ public class FilmService {
         likesDao.removeLike(id, userId);
     }
 
+    public List<Film> findByParameter(String query, String by) {
+        return filmStorage.findByParameter(query, by);
+    }
+
     public void deleteFilmById(Long id) {
         filmStorage.deleteFilmById(id);
     }
