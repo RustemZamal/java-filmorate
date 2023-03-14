@@ -32,6 +32,9 @@ public class Film {
     private long duration;
 
     private Mpa mpa;
+
     private Set<Genre> genres;
+
+    private Set<Director> directors;
 }
 

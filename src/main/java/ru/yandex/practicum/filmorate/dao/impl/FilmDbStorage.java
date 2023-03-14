@@ -8,11 +8,9 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.dao.FilmGenreDao;
-import ru.yandex.practicum.filmorate.dao.GenreDao;
-import ru.yandex.practicum.filmorate.dao.LikesDao;
-import ru.yandex.practicum.filmorate.dao.MpaRatingDao;
+import ru.yandex.practicum.filmorate.dao.*;
 import ru.yandex.practicum.filmorate.exceptions.FilmNotFountException;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.model.Mpa;
@@ -41,14 +39,23 @@ public class FilmDbStorage implements FilmStorage {
 
     private final static String SQL_GET_FILM_BY_ID = "SELECT * FROM film WHERE film_id = :film_id";
 
-    private final static String SQL_DELETE_FILM_BY_ID = "DELETE FROM film WHERE film_id = ?";
+    private final static String SQL_DELETE_FILM_BY_ID = "DELETE FROM film WHERE film_id = :film_id";
 
-    private final static String SQL = "SELECT fm.* " +
+    private final static String SQL_GET_POPULAR = "SELECT fm.* " +
             "FROM film AS fm " +
             "LEFT JOIN like_to_film AS lf ON fm.film_id = lf.film_id " +
             "GROUP BY fm.film_id " +
             "ORDER BY COUNT(lf.user_id) DESC " +
             "LIMIT :LIMIT";
+
+    private final static String SQL_FIND_BY_PARAMETER = "SELECT f.* " +
+            "FROM FILM f " +
+            "LEFT JOIN like_to_film lf ON f.film_id = lf.film_id " +
+            "LEFT JOIN FILM_DIRECTOR FD on f.FILM_ID = FD.FILM_ID " +
+            "LEFT JOIN DIRECTOR D on D.ID = FD.DIRECTOR_ID " +
+            "WHERE %s " +
+            "GROUP BY f.film_id " +
+            "ORDER BY COUNT(lf.user_id) DESC";
 
     private final MpaRatingDao mpaRating;
     private final GenreDao genreDao;
@@ -56,6 +63,8 @@ public class FilmDbStorage implements FilmStorage {
     private  final LikesDao likesDao;
 
     private final FilmGenreDao filmGenreDao;
+
+    private final FilmDirectorDao filmDirectorDao;
 
     private final NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
@@ -80,6 +89,12 @@ public class FilmDbStorage implements FilmStorage {
             }
         }
 
+        if (film.getDirectors() != null) {
+            for (Director director : film.getDirectors()) {
+                filmDirectorDao.insertToFilmDirector(film.getId(), director.getId());
+            }
+        }
+
         return film;
     }
 
@@ -98,19 +113,23 @@ public class FilmDbStorage implements FilmStorage {
             throw new FilmNotFountException(String.format("Фильм с ID=%d не существует", film.getId()));
         }
 
-        if(film.getGenres() == null || film.getGenres().isEmpty()) {
-            filmGenreDao.deleteRowFromFilmGenre(film.getId());
-            log.debug("Обновлен фильм с id={}", film.getId());
-            return findFilmById(film.getId());
-        }
 
+        // Надо переделать !!!
         filmGenreDao.deleteRowFromFilmGenre(film.getId());
+        filmDirectorDao.deleteRowFromFilmDirector(film.getId());
 
 
-        for (Genre genre : film.getGenres()) {
-            filmGenreDao.insertToFilmGenre(film.getId(), genre.getId());
+        if (film.getGenres() != null) {
+            for (Genre genre : film.getGenres()) {
+                filmGenreDao.insertToFilmGenre(film.getId(), genre.getId());
+            }
         }
 
+        if (film.getDirectors() != null) {
+            for (Director director : film.getDirectors()) {
+                filmDirectorDao.insertToFilmDirector(film.getId(), director.getId());
+            }
+        }
         log.debug("Обновлен фильм с id={}", film.getId());
         return findFilmById(film.getId());
     }
@@ -134,9 +153,39 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public List<Film> getPopularFilm(Integer count) {
         log.debug("Запрошен список популярных фильмов по кол-во лайков, в ограничинии-{} фильм(ов).", count);
-        return namedParameterJdbcTemplate.query(SQL, new MapSqlParameterSource("LIMIT", count), this::makeFilm);
+        return namedParameterJdbcTemplate.query(SQL_GET_POPULAR, new MapSqlParameterSource("LIMIT", count), this::makeFilm);
     }
 
+    @Override
+    public List<Film> findByParameter(String query, String by) {
+        SqlParameterSource parameterSource = new MapSqlParameterSource()
+                .addValue("name", query);
+        if (by.contains("director") && by.contains("title")) {
+            String SQL_FIND_ANYWAY = String.format( // LOWER(f.name) LIKE LOWER('%upDatE%') OR LOWER(D.NAME) LIKE LOWER('%upDatE%')
+                    SQL_FIND_BY_PARAMETER, "LOWER(f.name) LIKE LOWER(?) OR LOWER(D.name) LIKE LOWER(?)");
+            List<Film> films = namedParameterJdbcTemplate.getJdbcOperations().query(
+                    SQL_FIND_ANYWAY, this::makeFilm, "%" + query + "%", "%" + query + "%");
+            return films;
+
+        } else if (by.contains("title")) {
+            String SQL = String.format(SQL_FIND_BY_PARAMETER, "LOWER(f.name) LIKE LOWER(?)"); // LOWER(NAME) LIKE LOWER('%FiL%')
+            List<Film> films = namedParameterJdbcTemplate.getJdbcOperations().query(
+                    SQL, this::makeFilm, "%" + query + "%");
+            return films;
+
+        } else if (by.contains("director")) {
+            String SQL_BY_DIRECTOR = String.format(SQL_FIND_BY_PARAMETER, "LOWER(D.name) LIKE LOWER(?)");
+            List<Film> films = namedParameterJdbcTemplate.getJdbcOperations().query(
+                    SQL_BY_DIRECTOR, this::makeFilm, "%" + query + "%");
+            return films;
+        }
+        return List.of();
+    }
+
+    @Override
+    public void deleteFilmById(Long id) {
+        namedParameterJdbcTemplate.update(SQL_DELETE_FILM_BY_ID, new MapSqlParameterSource());
+    }
 
     private Film makeFilm(ResultSet resultSet, int rowNum) throws SQLException {
         Mpa mpa = mpaRating.getMpaById(resultSet.getInt("mpa_rating"));
@@ -155,8 +204,4 @@ public class FilmDbStorage implements FilmStorage {
                 .build();
     }
 
-    @Override
-    public void deleteFilmById(Long id) {
-        namedParameterJdbcTemplate.update(SQL_DELETE_FILM_BY_ID, new MapSqlParameterSource());
-    }
 }

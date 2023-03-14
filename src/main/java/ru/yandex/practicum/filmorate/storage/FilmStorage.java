@@ -40,5 +40,7 @@ public interface FilmStorage {
      */
     List<Film> getPopularFilm(Integer count);
 
+    List<Film> findByParameter(String query, String by);
+
     void deleteFilmById(Long id);
 }
