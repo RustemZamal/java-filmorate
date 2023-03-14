@@ -202,6 +202,10 @@ public class FilmDbStorage implements FilmStorage {
         namedParameterJdbcTemplate.update(SQL_DELETE_FILM_BY_ID, new MapSqlParameterSource());
     }
 
+    /**
+     * Метод по добавлению жанров и режиссеров в БД в свои таблицы.
+     * @param film фильм из которого извлекаются жанры и режиссеры.
+     */
     private void addGenreAndDirector(Film film) {
         if (film.getGenres() != null) {
             for (Genre genre : film.getGenres()) {
@@ -234,5 +238,4 @@ public class FilmDbStorage implements FilmStorage {
                 .directors(directors)
                 .build();
     }
-
 }

@@ -86,12 +86,24 @@ public class FilmController {
         return filmService.findPopularFilms(count);
     }
 
+    /**
+     *
+     * @param query текст для поиска.
+     * @param by критериий поиска, может принамать занчение director или title.
+     * @return Возвращает сприсок фильмов по пулярности отсоритрованные по тексту и критерию.
+     */
     @GetMapping("/search")
     public List<Film> findByParameter(@RequestParam String query, @RequestParam String by) {
-        return filmService.findByParameter(query, by); // query
+        return filmService.findByParameter(query, by);
     }
 
 
+    /**
+     *
+     * @param directorId идентификатор режиссера.
+     * @param sortBy принимает значение year или likes и сортирует в зависимости от значения.
+     * @return Возвращает список фильмов режиссера отсортированных по количеству лайков или году выпуска.
+     */
     @GetMapping("/director/{directorId}")
     public List<Film> findFilmBySorting(@PathVariable Long directorId, @RequestParam String sortBy) {
         return filmService.findFilmBySorting(directorId, sortBy);

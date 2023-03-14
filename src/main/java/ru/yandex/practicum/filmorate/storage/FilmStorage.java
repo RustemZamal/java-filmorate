@@ -41,6 +41,12 @@ public interface FilmStorage {
      */
     List<Film> getPopularFilm(Integer count);
 
+    /**
+     *
+     * @param query текст для поиска.
+     * @param by критериий поиска, может принамать занчение director или title.
+     * @return Возвращает сприсок фильмов по пулярности отсоритрованные по тексту и критерию.
+     */
     List<Film> findByParameter(String query, String by);
 
     List<Film> findFilmBySorting(Long directorId, String sortBy);

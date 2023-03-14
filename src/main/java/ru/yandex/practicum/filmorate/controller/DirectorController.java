@@ -22,27 +22,49 @@ public class DirectorController {
 
     private final FilmDirectorDao filmDirectorDao;
 
-
+    /**
+     *
+     * @param director сущность режиссер.
+     * @return Возвращает созданый объект режиссер {@link FilmDirectorDao#addDirector(Director)}.
+     */
     @PostMapping
     public Director addDirector(@Valid @RequestBody Director director) {
         return filmDirectorDao.addDirector(director);
     }
 
+    /**
+     *
+     * @param director сущность режиссер.
+     * @return Возвращает обновленый объект режиссер.
+     */
     @PutMapping
     public Director upadateDirector(@Valid @RequestBody Director director) {
         return filmDirectorDao.updateDirector(director);
     }
 
+    /**
+     *
+     * @param id идентификатор режиссера
+     * @return Возращает режиссера по его id.
+     */
     @GetMapping("/{id}")
     public Director findDirectorById(@PathVariable Long id) {
         return filmDirectorDao.findDirectorById(id);
     }
 
+    /**
+     *
+     * @return Возвращает всех режиссеров.
+     */
     @GetMapping
     public List<Director> findAllDirectors() {
         return filmDirectorDao.findAllDirectors();
     }
 
+    /**
+     * Эндпоинт по удалению режиссера по его id.
+     * @param id идентификатор режиссера.
+     */
     @DeleteMapping("/{id}")
     public void deleteDirector(@PathVariable Long id) {
         filmDirectorDao.deleteDirector(id);
