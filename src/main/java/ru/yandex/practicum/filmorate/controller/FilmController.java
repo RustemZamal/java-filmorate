@@ -5,11 +5,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
-import java.util.*;
+import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @RestController
@@ -75,6 +77,17 @@ public class FilmController {
     @GetMapping("/popular")
     public List<Film> getPopularFilms(@RequestParam(defaultValue = "10") Integer count) {
         return filmService.findPopularFilms(count);
+    }
+
+    @GetMapping("/search")
+    public List<Film> findByParameter(@RequestParam String query, @RequestParam String by) {
+        return filmService.findByParameter(query, by); // query
+    }
+
+
+    @GetMapping("/director/{directorId}")
+    public List<Director> findFilmBySorting(@PathVariable Long directorId, @RequestParam String sortBy) {
+        return null;
     }
 
     /**
