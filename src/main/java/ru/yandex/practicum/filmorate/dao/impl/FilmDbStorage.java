@@ -271,7 +271,7 @@ public class FilmDbStorage implements FilmStorage {
     public List <Film> getPopularFilmByDateAndGenre (Integer count, Integer genreId, Integer year) {
         log.debug(String.format("Запрошен список популярных фильмов по жанру и году. Где год: %s , жанр ID: %s, лимит: %s ",
                 year, genreId, count));
-        String SQL = "s";
+        String SQL;
 
         if (genreId != -1 && year != -1){
             SQL = String.format(SQL_GET_POPULAR_DATA_AND_GENRE, genreId, year, count);

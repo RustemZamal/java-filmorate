@@ -92,8 +92,13 @@ public class FilmService {
      * @param count количество фильмов, по умолчанию 10.
      * @return Возвращает список популярных фильмов согласна параметру count.
      */
-    public List<Film> findPopularFilms(Integer count) {
-        return filmStorage.getPopularFilm(count);
+    public List<Film> findPopularFilms(Integer count, Integer genreId, Integer year) {
+
+        if (genreId != -1 || year != -1) {
+            return filmStorage.getPopularFilmByDateAndGenre(count, genreId, year);
+        } else {
+            return filmStorage.getPopularFilm(count);
+        }
     }
 
     /**

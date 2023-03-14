@@ -71,14 +71,6 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public List<Film> getPopularFilmByDateAndGenre (Integer count, Integer genreId, Integer year){
-        List<Film> filmsSort = new ArrayList<>();
-        for (Film film : films.values().stream().filter(p -> (p.getReleaseDate().getYear() == year)).collect(Collectors.toList())) {
-            for (Genre genre : film.getGenres()) {
-                if (Objects.equals(genre.getId(), genreId)){
-                    filmsSort.add(film);
-                }
-            }
-        }
-        return filmsSort;
+        return null;
     }
 }

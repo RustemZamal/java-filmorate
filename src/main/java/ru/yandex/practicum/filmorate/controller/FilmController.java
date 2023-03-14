@@ -79,17 +79,13 @@ public class FilmController {
     /**
      * Эндпоинт по нахождению популярных по количеству лайков фильмов.
      * @param count количество фильмов, по умолчанию 10.
-     * @return Возвращает список фильмов согласна параметру count. {@link FilmService#findPopularFilms(Integer)}
+     * @return Возвращает список фильмов согласна параметру count. {@link FilmService#findPopularFilms(Integer, Integer, Integer)}
      */
     @GetMapping("/popular")
     public List<Film> getPopularFilms(@RequestParam(defaultValue = "10") Integer count,
                                       @RequestParam (defaultValue = "-1") Integer genreId,
                                       @RequestParam (defaultValue = "-1") Integer year) {
-        if (genreId != -1 || year != -1) {
-            return  filmService.findPopularByDateAndGenre(count, genreId, year);
-        } else {
-            return filmService.findPopularFilms(count);
-        }
+            return  filmService.findPopularFilms(count, genreId, year);
     }
 
     @GetMapping("/search")
