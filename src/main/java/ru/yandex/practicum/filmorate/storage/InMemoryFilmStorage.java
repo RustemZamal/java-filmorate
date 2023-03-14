@@ -2,12 +2,12 @@ package ru.yandex.practicum.filmorate.storage;
 
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.PostNotFoundException;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Component
@@ -60,7 +60,17 @@ public class InMemoryFilmStorage implements FilmStorage {
     }
 
     @Override
+    public List<Film> findFilmBySorting(Long directorId, String sortBy) {
+        return null;
+    }
+
+    @Override
     public void deleteFilmById(Long id) {
         films.remove(id);
+    }
+
+    @Override
+    public List<Film> getPopularFilmByDateAndGenre (Integer count, Integer genreId, Integer year){
+        return null;
     }
 }

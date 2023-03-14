@@ -2,7 +2,9 @@ package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 import ru.yandex.practicum.filmorate.dao.LikesDao;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
@@ -46,7 +48,7 @@ public class FilmService {
      * @return Возвращает измененный фильм
      */
     public Film updateFilm(Film film) {
-        if (film.getGenres() != null) {
+        if (film.getGenres() != null && film.getGenres().size() > 1) {
             film.setGenres(film.getGenres()
                     .stream()
                     .sorted(Comparator.comparing(Genre::getId))
@@ -90,8 +92,13 @@ public class FilmService {
      * @param count количество фильмов, по умолчанию 10.
      * @return Возвращает список популярных фильмов согласна параметру count.
      */
-    public List<Film> findPopularFilms(Integer count) {
-        return filmStorage.getPopularFilm(count);
+    public List<Film> findPopularFilms(Integer count, Integer genreId, Integer year) {
+
+        if (genreId != -1 || year != -1) {
+            return filmStorage.getPopularFilmByDateAndGenre(count, genreId, year);
+        } else {
+            return filmStorage.getPopularFilm(count);
+        }
     }
 
     /**
@@ -110,8 +117,23 @@ public class FilmService {
         return filmStorage.findByParameter(query, by);
     }
 
+    public List<Film> findFilmBySorting(Long directorId, String sortBy) {
+        return filmStorage.findFilmBySorting(directorId, sortBy);
+    }
+
     public void deleteFilmById(Long id) {
         filmStorage.deleteFilmById(id);
+    }
+
+    /**
+     * Метод по нахождению популярных по количеству лайков фильмов, году и жанру.
+     * @param count количество фильмов, по умолчанию 10.
+     * @genreId genreId id жанра.
+     * @year year год выхода фильма.
+     * @return Возвращает список популярных фильмов согласна параметру count.
+     */
+    public List<Film> findPopularByDateAndGenre (Integer count, Integer genreId, Integer year){
+        return filmStorage.getPopularFilmByDateAndGenre(count, genreId, year);
     }
 
 }
