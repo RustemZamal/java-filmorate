@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.storage;
 
 import org.springframework.stereotype.Component;
 import ru.yandex.practicum.filmorate.exceptions.PostNotFoundException;
+import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 
 import java.util.ArrayList;
@@ -56,6 +57,11 @@ public class InMemoryFilmStorage implements FilmStorage {
 
     @Override
     public List<Film> findByParameter(String query, String by) {
+        return null;
+    }
+
+    @Override
+    public List<Film> findFilmBySorting(Long directorId, String sortBy) {
         return null;
     }
 

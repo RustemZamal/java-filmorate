@@ -3,9 +3,16 @@ package ru.yandex.practicum.filmorate.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
-import ru.yandex.practicum.filmorate.model.Director;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
 
@@ -79,15 +86,27 @@ public class FilmController {
         return filmService.findPopularFilms(count);
     }
 
+    /**
+     *
+     * @param query текст для поиска.
+     * @param by критериий поиска, может принамать занчение director или title.
+     * @return Возвращает сприсок фильмов по пулярности отсоритрованные по тексту и критерию.
+     */
     @GetMapping("/search")
     public List<Film> findByParameter(@RequestParam String query, @RequestParam String by) {
-        return filmService.findByParameter(query, by); // query
+        return filmService.findByParameter(query, by);
     }
 
 
+    /**
+     *
+     * @param directorId идентификатор режиссера.
+     * @param sortBy принимает значение year или likes и сортирует в зависимости от значения.
+     * @return Возвращает список фильмов режиссера отсортированных по количеству лайков или году выпуска.
+     */
     @GetMapping("/director/{directorId}")
-    public List<Director> findFilmBySorting(@PathVariable Long directorId, @RequestParam String sortBy) {
-        return null;
+    public List<Film> findFilmBySorting(@PathVariable Long directorId, @RequestParam String sortBy) {
+        return filmService.findFilmBySorting(directorId, sortBy);
     }
 
     /**
